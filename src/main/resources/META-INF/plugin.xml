@@ -1,0 +1,37 @@
+<idea-plugin>
+    <id>net.uzimith.easycursor</id>
+    <name>easycursor</name>
+    <version>1.0</version>
+    <vendor email="uzimith.x9@gmail.com"
+    url="https://github.com/uzimith">uzimith</vendor>
+    <description>
+        <![CDATA[
+      This is a port supported only line actions of vim-easymotion.
+    ]]>
+</description>
+    <change-notes>
+        <![CDATA[
+        1.0 first release.
+    ]]>
+</change-notes>
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+    <idea-version since-build="145.0" />
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+       on how to target different products -->
+    <!-- uncomment to enable plugin in all products
+  <depends>com.intellij.modules.lang</depends>
+  -->
+    <extensions defaultExtensionNs="com.intellij">
+        <projectService serviceInterface="net.uzimith.easycursor.PluginConfig"
+        serviceImplementation="net.uzimith.easycursor.PluginConfig" />
+    </extensions>
+    <actions>
+        <action id="HelloAction"
+        class="net.uzimith.easycursor.HelloAction"
+        text="Say Hello">
+            <add-to-group group-id="ToolsMenu" anchor="first" />
+            <keyboard-shortcut keymap="$default"
+            first-keystroke="shift meta 2" />
+        </action>
+    </actions>
+</idea-plugin>
