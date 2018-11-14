@@ -1,26 +1,35 @@
+ThisBuild / ideaPluginName := "easycursor"
+ThisBuild / ideaEdition := IdeaEdition.Community
+ThisBuild / ideaBuild := "183.4284.36"
+
 lazy val easycursor = (project in file("."))
   .enablePlugins(SbtIdeaPlugin)
   .settings(
     organization := "net.uzimith",
-    ideaPluginName := "easycursor",
     scalaVersion := "2.12.7",
-    ideaBuild := "0.1.0-SNAPSHOT",
     scalacOptions ++= Seq("-unchecked",
                           "-deprecation",
                           "-feature",
                           "-language:implicitConversions",
                           "-Ywarn-unused:imports"),
     Compile / console / scalacOptions -= "-Ywarn-unused:imports",
-    assembly / assemblyOption := (assembly / assemblyOption).value.copy(includeScala = true),
     assemblyExcludedJars in assembly := ideaFullJars.value
   )
 
-lazy val ideaRunner = createRunnerProject(easycursor, "idea-runner")
+lazy val ideaRunner = (project in file("target/tools"))
   .settings(
-    run / javaOptions ++= Seq(
-      s"-Didea.home=${ideaBaseDirectory.value.getPath}"),
+    unmanagedJars in Compile := ideaMainJars.value,
+    unmanagedJars in Compile += file(System.getProperty("java.home")).getParentFile / "lib" / "tools.jar",
+    mainClass in (Compile, run) := Some("com.intellij.idea.Main"),
+    run / javaOptions := Seq(
+      "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005",
+      s"-Didea.home=${ideaBaseDirectory.value.getPath}",
+      s"-Dplugin.path=${(easycursor / assembly / assemblyOutputPath).value}",
+    ),
     run / fork := true
   )
+
+addCommandAlias("runIde", "; assembly; ideaRunner/run")
 
 easycursor / packagePluginZip := {
   val pluginJar = (easycursor / assembly).value
