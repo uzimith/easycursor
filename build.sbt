@@ -13,23 +13,30 @@ lazy val easycursor = (project in file("."))
                           "-language:implicitConversions",
                           "-Ywarn-unused:imports"),
     Compile / console / scalacOptions -= "-Ywarn-unused:imports",
-    assemblyExcludedJars in assembly := ideaFullJars.value
+    Global / onLoad ~= { _.andThen("updateIdea" :: _) },
+    assembly / assemblyExcludedJars ++= ideaFullJars.value,
+    assembly / assemblyOption ~= { _.copy(includeScala = false) },
+    ideaExternalPlugins += IdeaPlugin
+      .Zip("scala-plugin", url("https://plugins.jetbrains.com/plugin/download?rel=true&updateId=45268"))
   )
 
 lazy val ideaRunner = (project in file("target/tools"))
   .settings(
+    scalaVersion := "2.12.7",
+    autoScalaLibrary := false,
     unmanagedJars in Compile := ideaMainJars.value,
     unmanagedJars in Compile += file(System.getProperty("java.home")).getParentFile / "lib" / "tools.jar",
-    mainClass in (Compile, run) := Some("com.intellij.idea.Main"),
+    Compile / compile := ((Compile / compile) dependsOn (easycursor / assembly)).value,
+    Compile / run / mainClass := Some("com.intellij.idea.Main"),
     run / javaOptions := Seq(
       "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005",
       s"-Didea.home=${ideaBaseDirectory.value.getPath}",
+      s"-Didea.system.path=${ideaTestSystemDir.value}",
+      s"-Didea.config.path=${ideaTestConfigDir.value}",
       s"-Dplugin.path=${(easycursor / assembly / assemblyOutputPath).value}",
     ),
     run / fork := true
   )
-
-addCommandAlias("runIde", "; assembly; ideaRunner/run")
 
 easycursor / packagePluginZip := {
   val pluginJar = (easycursor / assembly).value
