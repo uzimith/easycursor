@@ -1,6 +1,6 @@
 ThisBuild / ideaPluginName := "easycursor"
 ThisBuild / ideaEdition := IdeaEdition.Community
-ThisBuild / ideaBuild := "183.4284.36"
+ThisBuild / ideaBuild := "183.4284.93"
 
 lazy val easycursor = (project in file("."))
   .enablePlugins(SbtIdeaPlugin)
@@ -13,11 +13,8 @@ lazy val easycursor = (project in file("."))
                           "-language:implicitConversions",
                           "-Ywarn-unused:imports"),
     Compile / console / scalacOptions -= "-Ywarn-unused:imports",
+    assembly / assemblyExcludedJars := ideaFullJars.value,
     Global / onLoad ~= { _.andThen("updateIdea" :: _) },
-    assembly / assemblyExcludedJars ++= ideaFullJars.value,
-    assembly / assemblyOption ~= { _.copy(includeScala = false) },
-    ideaExternalPlugins += IdeaPlugin
-      .Zip("scala-plugin", url("https://plugins.jetbrains.com/plugin/download?rel=true&updateId=45268"))
   )
 
 lazy val ideaRunner = (project in file("target/tools"))
