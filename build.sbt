@@ -7,12 +7,6 @@ lazy val easycursor = (project in file("."))
   .settings(
     organization := "net.uzimith",
     scalaVersion := "2.12.7",
-    scalacOptions ++= Seq("-unchecked",
-                          "-deprecation",
-                          "-feature",
-                          "-language:implicitConversions",
-                          "-Ywarn-unused:imports"),
-    Compile / console / scalacOptions -= "-Ywarn-unused:imports",
     assembly / assemblyExcludedJars := ideaFullJars.value,
     Global / onLoad ~= { _.andThen("updateIdea" :: _) },
   )
